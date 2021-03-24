@@ -16,14 +16,7 @@ public class AudioMix : MonoBehaviour
     public void Start()
     {
         _Mixer.updateMode = AudioMixerUpdateMode.UnscaledTime;
-        if (_Mixer == null)
-        {
-            //Debug.Log("Audio Mixer not found.");
-        }
-        else
-        {
-            
-        }
+
         Transition(false, false);
     }
 
@@ -52,7 +45,7 @@ public class AudioMix : MonoBehaviour
         else if(isMoving)
         {
             last = movement;
-            TransitionToSnapshot(movement, 2f);
+            TransitionToSnapshot(movement, 1.5f);
         }
         else 
         {

@@ -64,18 +64,19 @@ public class Inventory : MonoBehaviour
         //return false;
     }
 
+    public Weapon CheckWeapon()
+    {
+        return heldWeapon;
+    }
+
     public Food CheckFood()
     {
-        if(HasFood())
-        {
-            return heldFood as Food;
-        }
-        return null;
+        return heldFood;
     }
 
     public void DropItem(string type = "")
     {
-        Debug.Log("Dropping item: " + type);
+        //Debug.Log("Dropping item: " + type);
         switch(type)
         {
             case "food":

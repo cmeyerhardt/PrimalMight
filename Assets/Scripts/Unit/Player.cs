@@ -24,17 +24,20 @@ public class Player : Character
 
     public void Detect(Character detector, bool b)
     {
-        if(b && !detectors.Contains(detector))
+        if(detector != null && detector.gameObject != gameObject)
         {
-            detectors.Add(detector);
-        }
+            if (b && !detectors.Contains(detector))
+            {
+                detectors.Add(detector);
+            }
 
-        else if(!b && detectors.Contains(detector))
-        {
-            detectors.Remove(detector);
-        }
+            else if (!b && detectors.Contains(detector))
+            {
+                detectors.Remove(detector);
+            }
 
-        inCombat = detectors.Count > 0;
+            inCombat = detectors.Count > 0;
+        }
     }
 
     public override void Die()

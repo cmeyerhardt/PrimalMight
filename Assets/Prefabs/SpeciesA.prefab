@@ -759,7 +759,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2046759844021492909}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8787868958538836401
 GameObject:
@@ -1492,6 +1492,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4089648535190054900, guid: db5eca66054e590408ca32b369deb487,
         type: 3}
+      propertyPath: numLives
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4089648535190054900, guid: db5eca66054e590408ca32b369deb487,
+        type: 3}
+      propertyPath: maxNumLives
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4089648535190054900, guid: db5eca66054e590408ca32b369deb487,
+        type: 3}
       propertyPath: myCharacter
       value: 
       objectReference: {fileID: 5045484232107862617}
@@ -1526,12 +1536,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpeciesA
       objectReference: {fileID: 0}
-    - target: {fileID: 8454130208654759291, guid: db5eca66054e590408ca32b369deb487,
+    - target: {fileID: 8630095640009813162, guid: db5eca66054e590408ca32b369deb487,
         type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 13400000, guid: 3fbc26ac6b28d6d419c8dd315452e6f7,
-        type: 2}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 9164235792016406812, guid: db5eca66054e590408ca32b369deb487, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: db5eca66054e590408ca32b369deb487, type: 3}

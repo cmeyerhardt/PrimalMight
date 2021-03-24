@@ -4,16 +4,11 @@ using UnityEngine;
 
 public class Weapon : Item, IInteractable
 {
-    [SerializeField] float damage;
-    [SerializeField] float range;
+    [SerializeField] int damage;
+    [SerializeField] int range;
     
-    public float GetDamage() { return damage; }
-    public float GetRange() { return range; }
-
-    public override void BeDropped()
-    {
-        base.BeDropped();
-    }
+    public int GetDamage() { return damage; }
+    public int GetRange() { return range; }
 
     public override CursorType GetCursorType(Character c)
     {

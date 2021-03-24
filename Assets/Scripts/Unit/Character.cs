@@ -131,7 +131,7 @@ public class Character : MonoBehaviour
     {
         //Debug.Log("Character.Die");
         movement.enabled = false;
-        if(Player.Instance != null && gameObject != Player.Instance.gameObject)
+        if(Player.Instance != null)
         {
             Player.Instance.Detect(this, false);
         }
@@ -159,7 +159,14 @@ public class Character : MonoBehaviour
                 audioMod.PlayAudioClip(1);
             }
 
-            targeting.target.health.LoseHealth();
+            if(inventory.HasWeapon())
+            {
+                targeting.target.health.LoseHealth(inventory.CheckWeapon().GetDamage());
+            }
+            else
+            {
+                targeting.target.health.LoseHealth(1);
+            }
         }
     }
 

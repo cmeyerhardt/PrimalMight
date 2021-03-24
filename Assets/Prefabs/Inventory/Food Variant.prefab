@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemGlow: {fileID: 3689482056960754467}
   rb: {fileID: 5035683424885095519}
+  audioMod: {fileID: 7454899184730053904}
+  col: {fileID: 5759524660010808928}
   faction: 5
   lifeTime: 30
-  value: 5
+  value: 3
 --- !u!1001 &107731649538390376
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -299,3 +301,21 @@ Rigidbody:
     type: 3}
   m_PrefabInstance: {fileID: 4109941433827053163}
   m_PrefabAsset: {fileID: 0}
+--- !u!65 &5759524660010808928 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 8567114077067819019, guid: d8c164a9075a9bd4eafbc962efe8f870,
+    type: 3}
+  m_PrefabInstance: {fileID: 4109941433827053163}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7454899184730053904 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6808438485658424187, guid: d8c164a9075a9bd4eafbc962efe8f870,
+    type: 3}
+  m_PrefabInstance: {fileID: 4109941433827053163}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5035683424885095516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e91ae8b53d105c408a0c08dba5bdb7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

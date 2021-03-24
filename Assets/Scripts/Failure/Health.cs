@@ -38,9 +38,10 @@ public class Health : MonoBehaviour
         numLives = Mathf.Clamp(numLives + 1, 0, maxNumLives);
     }
     
-    public void LoseHealth()
+    public void LoseHealth(int numLost)
     {
-        numLives--;
+        numLives = Mathf.Clamp(numLives - numLost, 0, maxNumLives);
+
         if(numLives <= 0)
         {
             healthBarGO.SetActive(false);

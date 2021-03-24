@@ -63,9 +63,28 @@ public class AudioMod : MonoBehaviour
 
     public void PlayAudioClip(AudioClipGroup group = null, Vector3? positionOverride = null)
     {
-        Vector3 position = positionOverride == null ? transform.position : (Vector3)positionOverride;
+        Vector3 position = new Vector3();
+        if(positionOverride != null)
+        {
+            position = (Vector3)positionOverride;
+        }
+        else if(group.playSoundAtPlayer && (Camera.main != null || Player.Instance != null))
+        {
+            if(Player.Instance != null)
+            {
+                position = Player.Instance.transform.position;
+            }
+            else
+            {
+                position = Camera.main.transform.position;
+            }
+        }
+        else
+        {
+            position = transform.position;
+        }
 
-        if(Player.Instance != null && Vector3.Distance(Player.Instance.transform.position, position) < 10f)
+        if(Player.Instance == null || (Player.Instance != null && Vector3.Distance(Player.Instance.transform.position, position) < 10f))
         {
             if (group == null)
             {
@@ -137,7 +156,7 @@ public class AudioMod : MonoBehaviour
         public float basePitch = 1;
         public bool modulate = true;
         public float modulationLimits = 0f;
-        public Vector3? positionOverride = null;
+
 
         public AudioSettings() { }
 
@@ -148,10 +167,6 @@ public class AudioMod : MonoBehaviour
 
             //Volume & Spatial 
             this.maxVolume = maxVolume;
-            if (positionOverride != null)
-            {
-                this.positionOverride = positionOverride;
-            }
 
             //Pitch Modulation
             this.basePitch = basePitch;
@@ -178,6 +193,7 @@ public class AudioMod : MonoBehaviour
         public string label = "";
         public AudioClip[] clips = null;
         public AudioSettings[] settings = null;
+        public bool playSoundAtPlayer = false;
 
         public AudioClipGroup(string label = "", AudioClip[] clips = null, AudioSettings[] settings = null)
         {

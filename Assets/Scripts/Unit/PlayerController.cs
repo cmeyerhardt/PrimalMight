@@ -85,23 +85,33 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
-            if (player != null)
-            {
-                player.inventory.DropItem("");
-            }
+            DropItem();
         }
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            if (player != null && player.inventory.HasFood())
-            {
-                player.hunger.Eat();
-                player.inventory.ConsumeFood();
-                audioMod.PlayAudioClip(0);
-            }
+            ConsumeFood();
         }
     }
-    
+
+    public void ConsumeFood()
+    {
+        if (player != null && player.inventory.HasFood())
+        {
+            player.hunger.Eat();
+            player.inventory.ConsumeFood();
+            audioMod.PlayAudioClip(0);
+        }
+    }
+
+    public void DropItem()
+    {
+        if (player != null)
+        {
+            player.inventory.DropItem("");
+        }
+    }
+
     private void ProcessMovement()
     {
         if (Input.GetAxis("Horizontal") != 0f || Input.GetAxis("Vertical") != 0f)
@@ -152,7 +162,10 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            player.animator.SetFloat("speed", 0f);
+            if(player.animator!= null)
+            {
+                player.animator.SetFloat("speed", 0f);
+            }
             audioMix.Transition(false, player.inCombat);
         }
 

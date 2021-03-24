@@ -4905,7 +4905,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &3287153008329089562
 MonoBehaviour:
@@ -4948,6 +4948,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e91ae8b53d105c408a0c08dba5bdb7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioSource: {fileID: 0}
   awakeAudio:
     label: awake
     clips: []
@@ -4957,6 +4958,7 @@ MonoBehaviour:
       basePitch: 1
       modulate: 1
       modulationLimits: 0.1
+    playSoundAtPlayer: 0
   playAwakeOnEnable: 0
   audioClipGroups:
   - label: start
@@ -4968,6 +4970,7 @@ MonoBehaviour:
       basePitch: 1
       modulate: 1
       modulationLimits: 0.15
+    playSoundAtPlayer: 0
   - label: attack
     clips:
     - {fileID: 8300000, guid: 1acb8c567a26e564a8bb42d7d47b5eac, type: 3}
@@ -4982,6 +4985,7 @@ MonoBehaviour:
       basePitch: 1
       modulate: 0
       modulationLimits: 0.15
+    playSoundAtPlayer: 0
   - label: die
     clips:
     - {fileID: 8300000, guid: 150256288cf275c449d47fc7a1d1746e, type: 3}
@@ -4991,6 +4995,7 @@ MonoBehaviour:
       basePitch: 1
       modulate: 1
       modulationLimits: 0.2
+    playSoundAtPlayer: 0
   index: 0
   testClip: 0
 --- !u!1 &6529867926148684102
@@ -5034,7 +5039,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6529867926148684102}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 3fbc26ac6b28d6d419c8dd315452e6f7, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
