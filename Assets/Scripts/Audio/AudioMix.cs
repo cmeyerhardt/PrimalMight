@@ -13,6 +13,7 @@ public class AudioMix : MonoBehaviour
     public AudioMixerSnapshot last = null;
     public AudioMixer _Mixer = null;
 
+
     public void Start()
     {
         _Mixer.updateMode = AudioMixerUpdateMode.UnscaledTime;
@@ -27,6 +28,8 @@ public class AudioMix : MonoBehaviour
 
     public void TransitionBack()
     {
+        
+        Debug.Log("Transition back to: " + last.name);
         TransitionToSnapshot(last, 1f);
     }
 

@@ -22,8 +22,6 @@ public class Character : MonoBehaviour
 
     [SerializeField] GameObject hitFX = null;
 
-    public static Transform unitDeathTransform = null;
-
     public bool onCooldown = true;
     public float attackCooldown = 1f;
     public float attackTimer = 0f;
@@ -81,17 +79,17 @@ public class Character : MonoBehaviour
             return;
         }
 
-        if(isCannibal)
+        if (isCannibal)
         {
             aggressiveTimer += Time.deltaTime;
-            if(aggressiveTimer > 10f)
+            if (aggressiveTimer > 10f)
             {
                 AttackTarget(FindObjectOfType<NPC>());
                 aggressiveTimer = 0f;
             }
         }
 
-        if(onCooldown)
+        if (onCooldown)
         {
             if (attackTimer > 0f)
             {
@@ -133,7 +131,8 @@ public class Character : MonoBehaviour
         movement.enabled = false;
         if(Player.Instance != null)
         {
-            Player.Instance.Detect(this, false);
+            Debug.Log("Removing detection for this reference: " + this);
+            _ = Player.Instance.Detect(this, false);
         }
 
         hunger.DisableBar();

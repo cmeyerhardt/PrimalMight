@@ -5,7 +5,7 @@ using UnityEngine;
 public class Targeting : MonoBehaviour
 {
     [SerializeField] Character myCharacter = null;
-    [SerializeField] Transform lookTarget = null;
+    //[SerializeField] Transform lookTarget = null;
     [SerializeField] SphereCollider rangeCollider = null;
     [SerializeField] public Character target = null;
 
@@ -52,6 +52,35 @@ public class Targeting : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if(target == null)
+        {
+            Character c = other.GetComponent<Character>();
+            if (c != null && c != myCharacter)
+            {
+                if (myCharacter.isCannibal)
+                {
+                    if (c.faction == myCharacter.faction)
+                    {
+                        target = c;
+                        //Debug.Log(name + " is Cannibal and found target" + target.name);
+                    }
+                }
+                else if (c.faction != myCharacter.faction)
+                {
+                    target = c;
+                    //Debug.Log(name + " found target" + target.name);
+                }
+            }
+        }
+
+        if (target != null)
+        {
+            DetectPlayer();
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (target == null)
         {
             Character c = other.GetComponent<Character>();
             if (c != null && c != myCharacter)

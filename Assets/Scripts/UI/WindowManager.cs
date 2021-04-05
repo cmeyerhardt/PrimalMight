@@ -88,10 +88,6 @@ public class WindowManager : MonoBehaviour
     //    OpenWindow(titleWindow);
     //}
 
-    public void CloseWindowNoEvent(Window windowToClose)
-    {
-        CloseWindow(windowToClose, false);
-    }
 
     public void CloseWindow(Window windowToClose)
     {
@@ -118,9 +114,13 @@ public class WindowManager : MonoBehaviour
         //    }
         //}
 
-        if (openWindows.Count == 0 && menuToBeHidden != null)
+        if (openWindows.Count <= 0)
         {
-            menuToBeHidden.SetActive(true);
+            SceneLoader.Paused = false;
+            if (menuToBeHidden != null)
+            {
+                menuToBeHidden.SetActive(true);
+            }
         }
     }
 
@@ -151,54 +151,24 @@ public class WindowManager : MonoBehaviour
     //    return null;
     //}
 
-    public void OpenWindowWithEvent(Window windowToOpen)
-    {
-        OpenWindow(windowToOpen);
-    }
-
-    public void OpenWindowNoEvent(Window windowToOpen)
-    {
-        if (windowToOpen == null) { return; }
-        //do not reopen window if already open
-        if (openWindows.Contains(windowToOpen)) { return; }
-
-        //if (openWindows.Count > 0 && oneWindowAtOnce)
-        //{
-        //    Window window = openWindows[0];
-        //    if (window != null)
-        //    {
-        //        SaveWindow(window);
-        //    }
-        //}
-        openWindows.Add(windowToOpen);
-
-        windowToOpen.gameObject.SetActive(true);
-        if (windowToOpen.hideMenu && menuToBeHidden != null)
-        {
-            menuToBeHidden.SetActive(false);
-        }
-    }
 
     public void OpenWindow(Window windowToOpen)
     {
         if (windowToOpen == null) { return; }
         //do not reopen window if already open
         if (openWindows.Contains(windowToOpen)) { return; }
-        //Debug.Log("Opening window: " + windowToOpen);
-        //if (openWindows.Count > 0 && oneWindowAtOnce)
-        //{
-        //    Window window = openWindows[0];
-        //    if (window != null)
-        //    {
-        //        SaveWindow(window);
-        //    }
-        //}
-        openWindows.Add(windowToOpen);
 
+        openWindows.Add(windowToOpen);
         windowToOpen.gameObject.SetActive(true);
-        if (windowToOpen.hideMenu && menuToBeHidden != null)
+
+        if (/*windowToOpen.hideMenu &&*/ menuToBeHidden != null)
         {
             menuToBeHidden.SetActive(false);
+        }
+
+        if(openWindows.Count > 0)
+        {
+            SceneLoader.Paused = true;
         }
 
         windowToOpen.openEvent.Invoke();
@@ -214,6 +184,11 @@ public class WindowManager : MonoBehaviour
             openWindow.gameObject.SetActive(false);
         }
         openWindows.Clear();
+
+        if (openWindows.Count <= 0)
+        {
+            SceneLoader.Paused = false;
+        }
         menuToBeHidden.SetActive(true);
     }
 }

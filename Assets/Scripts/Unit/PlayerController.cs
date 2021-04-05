@@ -6,20 +6,28 @@ using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("State")]
+    public bool inControl = true;
+    public NPC m_toControl = null;
+    public bool pendingControl = false;
+    bool isMoving = false;
+
+    [Header("Configure")]
+    [SerializeField] float jumpForce = 60f;
+    [SerializeField] float playerSpeed = 5f;
+
+    [Header("Reference")]
     [SerializeField] AudioMix audioMix = null;
     [SerializeField] AudioMod audioMod = null;
     [SerializeField] Player player = null;
     [SerializeField] CameraControl cameraControl = null;
-    [SerializeField] float jumpForce = 60f;
-    public bool inControl = true;
+    [SerializeField] public UnitSpawner factionSpawnerA = null;
+    [SerializeField] public UnitSpawner factionSpawnerB = null;
+    
     //Static References
     public static PlayerController Instance;
     private static Dictionary<CursorType, Texture2D> cursorDictionary = new Dictionary<CursorType, Texture2D>();
-    public static UnitSpawner factionSpawnerA = null;
-    public static UnitSpawner factionSpawnerB = null;
-
-    public NPC toControl = null;
-    bool pendingControl = false;
+    private static Dictionary<WinCondition, Tuple<Window, ObjectiveDisplay>> winDictionary = new Dictionary<WinCondition, Tuple<Window, ObjectiveDisplay>>();
 
     //! Initialize
     public static void AssembleCursorDictionary(CursorMapping[] mappings)
@@ -30,11 +38,23 @@ public class PlayerController : MonoBehaviour
                 cursorDictionary.Add(mapping.type, mapping.cursor);
         }
     }
-    public static void SetUnitSpawners(UnitSpawner a, UnitSpawner b)
+    
+    public static void SetWinScreens(WinScreenMapping[] mappings)
     {
-        factionSpawnerA = a;
-        factionSpawnerB = b;
+        foreach (WinScreenMapping map in mappings)
+        {
+            if (!winDictionary.ContainsKey(map.winCondition))
+            {
+                winDictionary.Add(map.winCondition, new Tuple<Window, ObjectiveDisplay>(map.winScreen, map.objectiveDisplay));
+            }
+        }
     }
+
+    //public static void SetUnitSpawners(UnitSpawner a, UnitSpawner b)
+    //{
+    //    factionSpawnerA = a;
+    //    factionSpawnerB = b;
+    //}
 
     private void Awake()
     {
@@ -43,17 +63,31 @@ public class PlayerController : MonoBehaviour
             cameraControl = GetComponent<CameraControl>();
         }
         Player.playerController = this;
+        SceneLoader.PauseEvent.AddListener(TransitionPaused);
+    }
+
+    public void TransitionPaused(bool p)
+    {
+        if(p)
+        {
+            audioMix.TransitionPaused();
+        }
+        else
+        {
+            audioMix.Transition(isMoving, player? player.inCombat : false);
+            //audioMix.TransitionBack();
+        }
     }
 
     private void Update()
     {
-        if (player == null)
+        if (player == null && m_toControl == null)
         {
             CheckForNewUnitAndVictoryCondition();
             return;
         }
 
-        if(inControl)
+        if(inControl && player != null)
         {
             ProcessInventoryCommands();
             ProcessMovement();
@@ -114,171 +148,187 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessMovement()
     {
+        // Determine Magnitude of Input to apply to movement
+        Vector3 movementVector = Vector3.zero;
         if (Input.GetAxis("Horizontal") != 0f || Input.GetAxis("Vertical") != 0f)
         {
-            Vector3 forward = cameraControl.GetPivot().transform.forward;
-            Vector3 right = cameraControl.GetPivot().transform.right;
+            movementVector = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized;
+        }
+        else if(Input.GetMouseButton(1) && Input.GetMouseButton(0))
+        {
+            movementVector = Vector3.forward;
+        }
 
-            // zero out y-axis
-            forward.y = 0f;
-            right.y = 0f;
 
-            Vector3 relativeForward = forward.normalized * Input.GetAxis("Vertical") + right.normalized * (Input.GetAxis("Horizontal"));
-            player.animator.transform.forward = forward;
+        // If moving, determine direction of movement
+        Vector3 relativeForward = player.animator.transform.forward.normalized;
+        if (movementVector != Vector3.zero)
+        {
+            isMoving = true;
 
-            player.movement.UpdateAnimatorSpeed();
-
-            Vector3 movementVector = 10f * Time.deltaTime * relativeForward.normalized;
-            if (!player.movement.isGrounded)
+            // Get Camera forward
+            Transform reference = cameraControl.GetPivot();
+            if (reference != null)
             {
-                movementVector *= .5f;
+                relativeForward = reference.GetRelativeDirectionWithMagnitude(movementVector.x, movementVector.z).normalized;
+                player.animator.transform.forward = relativeForward;
             }
 
-            player.transform.position += movementVector;
-            audioMix.Transition(true, player.inCombat);
-        }
-        else if (Input.GetMouseButton(1) && Input.GetMouseButton(0))
-        {
-            Vector3 forward = cameraControl.GetPivot().transform.forward;
-            Vector3 right = cameraControl.GetPivot().transform.right;
-
-            // zero out y-axis
-            forward.y = 0f;
-            right.y = 0f;
-
-            Vector3 relativeForward = forward.normalized/* + right.normalized*/;
-            player.animator.transform.forward = forward;
-
-            player.movement.UpdateAnimatorSpeed();
-
-            Vector3 movementVector = 10f * Time.deltaTime * relativeForward.normalized;
+            relativeForward *= playerSpeed * Time.deltaTime;// * new Vector3(relativeForward.x * movementVector.x, 0f, relativeForward.z * movementVector.z);//relativeForward.Get.normalized;
             if (!player.movement.isGrounded)
             {
-                movementVector *= .5f;
+                relativeForward *= .5f;
             }
 
-            player.transform.position += movementVector;
-            audioMix.Transition(true, player.inCombat);
+            player.transform.position += relativeForward;
+            //player.movement.MoveInDirection(relativeForward, false);
+
+            if (player.animator != null)
+            {
+                player.animator.SetFloat("speed", playerSpeed);
+            }
+  
+            //audioMix.Transition(isMoving, player.inCombat);
         }
-        else
+        else //not moving
         {
-            if(player.animator!= null)
+            isMoving = false;
+            //Debug.Log("Not Moving");
+            if (player.animator != null)
             {
                 player.animator.SetFloat("speed", 0f);
             }
-            audioMix.Transition(false, player.inCombat);
+
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            //Debug.Log("Jump");
-            player.rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            Debug.Log("Jump");
+            player.rb.AddForce(Vector3.up * jumpForce + relativeForward, ForceMode.Impulse);
         }
+
+        audioMix.Transition(isMoving, player.inCombat);
     }
 
 
     
 
     //! WIN/LOSE CONDITIONS
-    
-    private static Dictionary<WinCondition, Window> winDictionary = new Dictionary<WinCondition, Window>();
-    public static void SetWinScreens(WinScreenMapping[] mappings)
-    {
-        foreach(WinScreenMapping map in mappings)
-        {
-            if(!winDictionary.ContainsKey(map.winCondition))
-            {
-                winDictionary.Add(map.winCondition, map.winScreen);
-            }
-        }
-    }
 
     public void PlayerDied()
     {
         //Debug.Log("Player died");
         //audioMod.PlayAudioClip(0);
         player.transform.parent = null;
-        CheckForNewUnitAndVictoryCondition();
-        pendingControl = true;
+        //CheckForNewUnitAndVictoryCondition();
+        pendingControl = false;
         player = null;
     }
 
+    // new unit exists? (assign to member ref if so)
     public void CheckForNewUnitAndVictoryCondition()
     {
-        Debug.Log("CheckForNewUnitAndVictoryCondition: " + pendingControl);
+        //Debug.Log("CheckForNewUnitAndVictoryCondition: " + pendingControl);
         if (!pendingControl)
         {
             Debug.Log("Checking for new unit");
             bool winThisTime = false;
-            toControl = null;
+            m_toControl = null;
 
             winThisTime = CheckWinCondition(WinCondition.FirstDeath);
             //todo -- if multiple wins per turn, only one win condition should get a new unit
 
             // if there are more friendly units to possess
-            if (factionSpawnerA.unitTransform.childCount > 0)
+            NPC[] a = factionSpawnerA.unitTransform.GetComponentsInChildren<NPC>();
+            Debug.Log("A: " + a.Length);
+            if (a.Length > 0)
             {
-                Debug.Log("A: " + factionSpawnerA.unitTransform.childCount);
-                toControl = factionSpawnerA.unitTransform.GetChild(factionSpawnerA.unitTransform.childCount - 1).GetComponent<NPC>();
-                pendingControl = true;
+                //Debug.Log("A: " + factionSpawnerA.unitTransform.childCount);
+                m_toControl = a[0];//0/*factionSpawnerA.unitTransform.childCount - 1*/);
+                if (m_toControl == null)
+                {
+                    // something went terribly wrong, the transform HAS children but NPC component was not found.  
+                    Debug.Log("Broken Object: " + a[0].gameObject.name);
+                }
+                else
+                {
+                    pendingControl = true;
+                }
+                //pendingControl = true;
             }
             else
             {
                 Debug.Log("No A");
-                winThisTime = CheckWinCondition(WinCondition.NoMoreA);
+                winThisTime = winThisTime | CheckWinCondition(WinCondition.NoMoreA);
             }
 
-            if (toControl == null)
+            if (m_toControl == null)
             {
-                if (factionSpawnerB.unitTransform.childCount > 0)
+                NPC[] b = factionSpawnerB.unitTransform.GetComponentsInChildren<NPC>();
+                Debug.Log("B: " + b.Length);
+                if (b.Length > 0)
                 {
-                    Debug.Log("B: " + factionSpawnerB.unitTransform.childCount);
-                    toControl = factionSpawnerB.unitTransform.GetChild(factionSpawnerB.unitTransform.childCount - 1).GetComponent<NPC>();
-                    pendingControl = true;
+                    //Debug.Log("B: " + factionSpawnerB.unitTransform.childCount);
+                    m_toControl = b[0];//m_toControl = factionSpawnerB.unitTransform.GetChild(0/*factionSpawnerB.unitTransform.childCount - 1*/).GetComponent<NPC>();
+                    if (m_toControl == null)
+                    {
+                        // something went terribly wrong, the transform HAS children but NPC component was not found. 
+                        Debug.Log("Broken Object: " + b[0].name);
+                    }
+                    else
+                    {
+                        pendingControl = true;
+                    }
                 }
                 else
                 {
                     Debug.Log("No B");
-                    winThisTime = CheckWinCondition(WinCondition.NoMoreB);
+                    winThisTime = winThisTime | CheckWinCondition(WinCondition.NoMoreB);
                 }
             }
 
-            if (toControl == null)
+            if (m_toControl == null)
             {
-                if(factionSpawnerA.unitTransform.childCount <= 0 && factionSpawnerB.unitTransform.childCount <= 0)
+                m_toControl = FindObjectOfType<NPC>();
+                if (m_toControl == null)
                 {
-                    toControl = FindObjectOfType<NPC>();
-                    if(toControl == null)
-                    {
-                        Debug.Log("No A or B");
-                        winThisTime = CheckWinCondition(WinCondition.NoMoreAnyone);
-                    }
+                    Debug.Log("No A or B");
+                    winThisTime = winThisTime | CheckWinCondition(WinCondition.NoMoreAnyone);
                 }
+                else
+                {
+                    pendingControl = true;
+                }
+                //if (factionSpawnerA.unitTransform.childCount <= 0 && factionSpawnerB.unitTransform.childCount <= 0)
+                //{
+
+                //}
             }
             
-            if(toControl != null)
+            if(m_toControl != null)
             {
-                
-                Debug.Log("Found new unit: " + toControl.name);
-            }
-
-            if(toControl != null && winThisTime == false)
-            {
-                AssignPlayerNewUnit();
+                Debug.Log("Found new unit: " + m_toControl.name + ", win? " + winThisTime);
+                if(!winThisTime)
+                {
+                    pendingControl = true;
+                    AssignPlayerNewUnit();
+                }
             }
         }
+
+        Debug.Log("Done finding new unit");
     }
 
     public void AssignPlayerNewUnit()
     {
         if(pendingControl)
         {
-            if (toControl != null)
+            if (m_toControl != null)
             {
-                player = toControl.gameObject.AddComponent<Player>();
-                player.faction = toControl.faction;
-                cameraControl.SetModel(toControl.animator.transform);
-                toControl = null;
+                player = m_toControl.gameObject.AddComponent<Player>();
+                player.faction = m_toControl.faction;
+                cameraControl.SetModel(m_toControl.animator.transform);
+                m_toControl = null;
 
                 Player.playerController = this;
                 player.gameObject.tag = "Player";
@@ -296,6 +346,8 @@ public class PlayerController : MonoBehaviour
             {
                 CheckForNewUnitAndVictoryCondition();
             }
+
+            
         }
     }
 
@@ -311,9 +363,17 @@ public class PlayerController : MonoBehaviour
         if (winDictionary.ContainsKey(win))
         {
             Debug.Log("Getting Win: " + win);
-            Window.windowManager.OpenWindow(winDictionary[win]);
+            Window.windowManager.OpenWindow(winDictionary[win].Item1);
+
+            winDictionary[win].Item2.gameObject.SetActive(true);
+            winDictionary[win].Item2.MarkComplete();
             winDictionary.Remove(win);
-            Debug.Log("Wins left:" + winDictionary.Count);
+
+            //if(win == WinCondition.NoMoreA || win == WinCondition.NoMoreB)
+            //{
+            //    winDictionary[WinCondition.NoMoreAnyone].Item2.gameObject.SetActive(true);
+            //}
+            //Debug.Log("Wins left:" + winDictionary.Count);
             return true;
         }
         return false;
@@ -411,6 +471,7 @@ public class WinScreenMapping
 {
     public WinCondition winCondition;
     public Window winScreen;
+    public ObjectiveDisplay objectiveDisplay;
 }
 
 public enum WinCondition { NoMoreA, NoMoreB, NoMoreAnyone, FoundFood, FirstDeath }

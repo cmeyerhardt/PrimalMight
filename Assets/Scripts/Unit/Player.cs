@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,26 +19,28 @@ public class Player : Character
     public override void Update()
     {
         base.Update();
-        detectors.RemoveNullReferences();
+        //detectors.RemoveNullReferences();
         inCombat = detectors.Count > 0;
     }
 
-    public void Detect(Character detector, bool b)
+    public bool Detect(Character detector, bool b)
     {
         if(detector != null && detector.gameObject != gameObject)
         {
-            if (b && !detectors.Contains(detector))
+            if (!b && detectors.Contains(detector))
+            {
+                detectors.Remove(detector);
+            }
+            else if (b && !detectors.Contains(detector))
             {
                 detectors.Add(detector);
             }
 
-            else if (!b && detectors.Contains(detector))
-            {
-                detectors.Remove(detector);
-            }
+            detectors.RemoveNullReferences();
 
             inCombat = detectors.Count > 0;
         }
+        return true;
     }
 
     public override void Die()
@@ -53,23 +56,36 @@ public class Player : Character
         NPC c = GetComponent<NPC>();
         if(c != null)
         {
-            c.movement.CancelMovement();
+            try { c.movement.CancelMovement(); }
+            catch(Exception e)
+            {
+                Debug.LogWarning(e.ToString());
+            }
+
             c.movement.nvm.enabled = false;
             c.movement.enabled = false;
 
             rb.isKinematic = false;
             rb.useGravity = true;
 
-            GetComponentInChildren<AnimationHelper>().SetCharacter(this);
+            AnimationHelper ah = GetComponentInChildren<AnimationHelper>();
+            if(ah!= null)
+            {
+                ah.SetCharacter(this);
+            }
+
 
             Instance = this;
             c.enabled = false;
 
             detectors = new List<Character>();
 
-            // dont destroy c:  destroying c will result in missing references
             Destroy(c, Time.deltaTime);
+        }
 
+        if(health == null)
+        {
+            health = GetComponent<Health>();
         }
 
         if(health != null)
@@ -78,7 +94,7 @@ public class Player : Character
         }
         else
         {
-            Debug.Log("health null");
+            Debug.LogWarning(name + " has no Health.cs");
         }
 
     }

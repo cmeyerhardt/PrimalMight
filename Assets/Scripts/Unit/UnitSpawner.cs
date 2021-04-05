@@ -18,6 +18,7 @@ public class UnitSpawner : MonoBehaviour, IInteractable
     [Header("Display")]
     [SerializeField] TextMeshProUGUI chargesText = null;
     [SerializeField] TextMeshProUGUI unitsText = null;
+    [SerializeField] TextMeshProUGUI objectiveText = null;
 
     [Header("Reference")]
     [SerializeField] Food food = null;
@@ -46,7 +47,16 @@ public class UnitSpawner : MonoBehaviour, IInteractable
                 break;
         }
         table.SetColor(color);
-        unitsText.color = color;
+
+        if(objectiveText != null)
+        {
+            objectiveText.color = color;
+        }
+        if(unitsText != null)
+        {
+            unitsText.color = color;
+        }
+
     }
 
     void Start()
@@ -82,7 +92,7 @@ public class UnitSpawner : MonoBehaviour, IInteractable
             {
                 c.hunger.Eat();
             }
-
+            
             foodCharges--;
             UpdateFoodChargeDisplay();
             if (foodCharges <= 0)
@@ -95,7 +105,7 @@ public class UnitSpawner : MonoBehaviour, IInteractable
         {
             Debug.Log("No food");
             //will anyone die ?
-            foreach (NPC c in unitTransform.GetComponentsInChildren<NPC>())
+            foreach (Character c in unitTransform.GetComponentsInChildren<Character>())
             {
                 c.hunger.DecreaseHunger();
             }

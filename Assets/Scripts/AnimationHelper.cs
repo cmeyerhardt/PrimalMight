@@ -8,6 +8,15 @@ public class AnimationHelper : MonoBehaviour
     [SerializeField] Character myCharacter = null;
     [SerializeField] ParticleSystem footstep = null;
     [SerializeField] AudioMod audioMod = null;
+    static PlayerController playerController = null;
+
+    private void Awake()
+    {
+        if(playerController == null)
+        {
+            playerController = FindObjectOfType<PlayerController>();
+        }
+    }
 
     public void SetCharacter(Character c)
     {
@@ -18,7 +27,7 @@ public class AnimationHelper : MonoBehaviour
     {
         if (myCharacter == Player.Instance)
         {
-            FindObjectOfType<PlayerController>().inControl = false;
+            playerController.inControl = false;
         }
     }
 
@@ -31,10 +40,9 @@ public class AnimationHelper : MonoBehaviour
     {
         if(myCharacter == Player.Instance)
         {
-            FindObjectOfType<PlayerController>().CheckForNewUnitAndVictoryCondition();
+            playerController.CheckForNewUnitAndVictoryCondition();
         }
     }
-
 
     public void Footstep()
     {

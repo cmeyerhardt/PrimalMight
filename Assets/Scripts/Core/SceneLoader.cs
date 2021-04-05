@@ -5,7 +5,19 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
+    public static BoolEvent PauseEvent = new BoolEvent();
     public static bool paused = false;
+    public static bool Paused
+    {
+        set
+        {
+            paused = value;
+            Time.timeScale = paused ? 0f : 1f;
+            PauseEvent.Invoke(paused);
+        }
+        get => paused;
+
+    }
 
     public void Pause()
     {

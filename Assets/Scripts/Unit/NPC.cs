@@ -3,7 +3,6 @@
 public class NPC : Character, IInteractable
 {
     float timer = 0f;
-
     
     public override void Start()
     {
@@ -89,8 +88,8 @@ public class NPC : Character, IInteractable
         {
             if(timer <= 0f)
             {
-                //idly walk 
-                Vector3 newDirection = Random.insideUnitSphere;//transform.position + new Vector3(3f.PlusOrMinus(), 0f, 0f);
+                //idly wander
+                Vector3 newDirection = Random.insideUnitSphere;
                 newDirection.y = 0f;
                 movement.MoveToDestination(transform.position + newDirection * (Random.Range(5, 10) * (isCannibal? 2f : 1f)));
                 timer = Random.Range(2, 5);

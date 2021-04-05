@@ -241,7 +241,7 @@ public static class CollectionExtensions
 
 
 
-public static class MathExtensionsC
+public static class MathExtensions
 {
     public static int[] GetOrderedArray(this int i)
     {
@@ -322,7 +322,7 @@ public static class MathExtensionsC
     }
 }
 
-public static class Vector3ExtensionsC
+public static class Vector3Extensions
 {
     public static Vector2 To2D(this Vector3 v3)
     {
@@ -331,7 +331,7 @@ public static class Vector3ExtensionsC
 }
 
 
-public static class TerrainExtensionsC
+public static class TerrainExtensions
 {
     public static TerrainData GetCurrentTerrainData(this Terrain terrain)
     {
@@ -353,7 +353,7 @@ public static class TerrainExtensionsC
 }
 
 
-public static class RendererExtensionsC
+public static class RendererExtensions
 {
     public static void SetColor(this Renderer renderer, Color color)
     {
@@ -372,7 +372,7 @@ public static class RendererExtensionsC
 
 
 
-public static class StringExtensionsC
+public static class StringExtensions
 {
     public static string RemoveRandomIndexC(this string s)
     {
@@ -403,7 +403,7 @@ public static class StringExtensionsC
 }
 
 
-public static class TransformExtensionsC
+public static class TransformExtensions
 {
     public static Transform[] GetImmediateChildArray(this Transform t)
     {
@@ -413,6 +413,40 @@ public static class TransformExtensionsC
             array[i] = t.GetChild(i);
         }
         return array;
+    }
+
+    public static Vector3 GetRelativeDirection(this Transform relativeTransform)
+    {
+        if (relativeTransform != null)
+        {
+            //component axes
+            Vector3 forward = relativeTransform.forward;
+            Vector3 right = relativeTransform.right;
+
+            // zero out y-axis
+            forward.y = 0f;
+            right.y = 0f;
+
+            return forward.normalized + right.normalized;
+        }
+        return Vector3.zero;
+    }
+
+    public static Vector3 GetRelativeDirectionWithMagnitude(this Transform relativeTransform, float h, float v)
+    {
+        if (relativeTransform != null)
+        {
+            //component axes
+            Vector3 forward = relativeTransform.forward;
+            Vector3 right = relativeTransform.right;
+
+            // zero out y-axis
+            forward.y = 0f;
+            right.y = 0f;
+
+            return forward.normalized * v + right.normalized * h;
+        }
+        return Vector3.zero;
     }
 }
 
