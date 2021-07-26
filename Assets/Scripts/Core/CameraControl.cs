@@ -41,6 +41,11 @@ public class CameraControl : MonoBehaviour
 
     }
 
+    public void SetPanSpeed(float speed)
+    {
+        panSpeed = Mathf.Clamp(speed, 500, 2000);
+    }
+
     //can be called from another class
     public void PanCamera()
     {
@@ -95,7 +100,8 @@ public class CameraControl : MonoBehaviour
     {
         RaycastHit[] hits = Physics.RaycastAll(toPan.transform.position,
             toZoom.transform.position - toPan.transform.position,
-            Mathf.Abs(toZoom.transform.position.z));
+            Mathf.Abs(toZoom.transform.position.z),
+            LayerMask.GetMask("Default"));
         hits = hits.SortHitsByDistance();
 
         if (hits.Length > 0)

@@ -132,7 +132,10 @@ public class Character : MonoBehaviour
         if(Player.Instance != null)
         {
             Debug.Log("Removing detection for this reference: " + this);
-            _ = Player.Instance.Detect(this, false);
+            if(Player.Instance.Detect(this, false))
+            {
+                Debug.Log("Removed " + gameObject.name);
+            }
         }
 
         hunger.DisableBar();

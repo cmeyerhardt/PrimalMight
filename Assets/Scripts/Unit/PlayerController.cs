@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     [Header("Configure")]
     [SerializeField] float jumpForce = 60f;
     [SerializeField] float playerSpeed = 5f;
+    [SerializeField] float turnSpeed = 5f;
 
     [Header("Reference")]
     [SerializeField] AudioMix audioMix = null;
@@ -87,7 +88,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if(inControl && player != null)
+        if(inControl && player != null && player.health.isAlive)
         {
             ProcessInventoryCommands();
             ProcessMovement();
@@ -122,7 +123,7 @@ public class PlayerController : MonoBehaviour
             DropItem();
         }
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             ConsumeFood();
         }
@@ -157,6 +158,11 @@ public class PlayerController : MonoBehaviour
         else if(Input.GetMouseButton(1) && Input.GetMouseButton(0))
         {
             movementVector = Vector3.forward;
+        }
+
+        if(Input.GetAxis("Rotate") != 0f)
+        {
+            transform.Rotate(Vector3.up, Input.GetAxis("Rotate") * turnSpeed);
         }
 
 
@@ -236,7 +242,6 @@ public class PlayerController : MonoBehaviour
             m_toControl = null;
 
             winThisTime = CheckWinCondition(WinCondition.FirstDeath);
-            //todo -- if multiple wins per turn, only one win condition should get a new unit
 
             // if there are more friendly units to possess
             NPC[] a = factionSpawnerA.unitTransform.GetComponentsInChildren<NPC>();
@@ -346,8 +351,6 @@ public class PlayerController : MonoBehaviour
             {
                 CheckForNewUnitAndVictoryCondition();
             }
-
-            
         }
     }
 

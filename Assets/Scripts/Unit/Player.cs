@@ -36,6 +36,7 @@ public class Player : Character
                 detectors.Add(detector);
             }
 
+            //todo -- fix
             detectors.RemoveNullReferences();
 
             inCombat = detectors.Count > 0;

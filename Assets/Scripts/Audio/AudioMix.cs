@@ -14,6 +14,15 @@ public class AudioMix : MonoBehaviour
     public AudioMixer _Mixer = null;
 
 
+    [SerializeField] public AudioMixerGroup master = null;
+    [SerializeField] public AudioMixerGroup music = null;
+    [SerializeField] public AudioMixerGroup sfx = null;
+    [SerializeField] public AudioMixerGroup uiSFX = null;
+    [SerializeField] public AudioMixerGroup voice = null;
+
+
+
+
     public void Start()
     {
         _Mixer.updateMode = AudioMixerUpdateMode.UnscaledTime;
@@ -63,5 +72,33 @@ public class AudioMix : MonoBehaviour
         {
             snapshot.TransitionTo(time);
         }
+    }
+
+
+    //Volume sliders
+
+    public void SetMasterVolume(float value)
+    {
+        _Mixer.SetFloat("masterVol", value);
+    }
+
+    public void SetMusicVolume(float value)
+    {
+        _Mixer.SetFloat("musicVol", value);
+    }
+
+    public void SetSFXVolume(float value)
+    {
+        _Mixer.SetFloat("sfxVol", value);
+    }
+
+    public void SetUIVolume(float value)
+    {
+        _Mixer.SetFloat("uiVol", value);
+    }
+
+    public void SetVoiceVolume(float value)
+    {
+        _Mixer.SetFloat("voiceVol", value);
     }
 }
